@@ -1,0 +1,593 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Neuer Kunde</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Arial, sans-serif;
+            background: #f0f2f5;
+            padding: 20px;
+            padding-bottom: 100px;
+        }
+        
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+        
+        .header {
+            background: linear-gradient(135deg, #25D366 0%, #128C7E 100%);
+            color: white;
+            padding: 25px 20px;
+            text-align: center;
+        }
+        
+        .header h1 {
+            font-size: 26px;
+            margin-bottom: 5px;
+            font-weight: 600;
+        }
+        
+        .header p {
+            font-size: 14px;
+            opacity: 0.95;
+        }
+        
+        .form-container {
+            padding: 25px 20px;
+        }
+        
+        .form-section {
+            margin-bottom: 25px;
+        }
+        
+        .section-title {
+            font-size: 16px;
+            font-weight: 600;
+            color: #1f1f1f;
+            margin-bottom: 15px;
+            padding-bottom: 8px;
+            border-bottom: 2px solid #25D366;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .form-group {
+            margin-bottom: 18px;
+        }
+        
+        .form-label {
+            display: block;
+            font-size: 14px;
+            font-weight: 500;
+            color: #3b4a54;
+            margin-bottom: 6px;
+        }
+        
+        .required {
+            color: #e74c3c;
+            margin-left: 3px;
+        }
+        
+        .form-input,
+        .form-select,
+        .form-textarea {
+            width: 100%;
+            padding: 12px 15px;
+            border: 1.5px solid #ddd;
+            border-radius: 8px;
+            font-size: 15px;
+            font-family: inherit;
+            transition: all 0.3s;
+            background: white;
+        }
+        
+        .form-input:focus,
+        .form-select:focus,
+        .form-textarea:focus {
+            outline: none;
+            border-color: #25D366;
+            box-shadow: 0 0 0 3px rgba(37, 211, 102, 0.1);
+        }
+        
+        .form-textarea {
+            resize: vertical;
+            min-height: 80px;
+        }
+        
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+        }
+        
+        .form-hint {
+            font-size: 12px;
+            color: #8696a0;
+            margin-top: 4px;
+        }
+        
+        .checkbox-group {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 12px;
+            background: #f8f9fa;
+            border-radius: 8px;
+            cursor: pointer;
+        }
+        
+        .checkbox-group input[type="checkbox"] {
+            width: 20px;
+            height: 20px;
+            cursor: pointer;
+            accent-color: #25D366;
+        }
+        
+        .checkbox-group label {
+            cursor: pointer;
+            font-size: 14px;
+            color: #3b4a54;
+        }
+        
+        .button-group {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: white;
+            padding: 15px 20px;
+            box-shadow: 0 -2px 10px rgba(0,0,0,0.1);
+            display: flex;
+            gap: 10px;
+        }
+        
+        .btn {
+            flex: 1;
+            padding: 14px 20px;
+            border: none;
+            border-radius: 10px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        
+        .btn-primary {
+            background: #25D366;
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            background: #20bd5a;
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(37, 211, 102, 0.3);
+        }
+        
+        .btn-primary:active {
+            transform: translateY(0);
+        }
+        
+        .btn-primary:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+            transform: none;
+        }
+        
+        .btn-secondary {
+            background: #f0f2f5;
+            color: #3b4a54;
+        }
+        
+        .btn-secondary:hover {
+            background: #e4e6e9;
+        }
+        
+        .error-message {
+            background: #fee;
+            color: #c00;
+            padding: 12px 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            font-size: 14px;
+            display: none;
+        }
+        
+        .loading-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.7);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+        
+        .loading-content {
+            background: white;
+            padding: 30px 40px;
+            border-radius: 15px;
+            text-align: center;
+        }
+        
+        .loading-spinner {
+            width: 50px;
+            height: 50px;
+            border: 5px solid #f3f3f3;
+            border-top: 5px solid #25D366;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 15px;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        @media (max-width: 500px) {
+            .form-row {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>➕ Neuer Kunde</h1>
+            <p>Fülle die Kundendaten aus</p>
+        </div>
+        
+        <div class="form-container">
+            <div class="error-message" id="errorMessage"></div>
+            
+            <form id="customerForm">
+                <!-- Basisinformationen -->
+                <div class="form-section">
+                    <div class="section-title">
+                        👤 Basisinformationen
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label">
+                            Kundentyp <span class="required">*</span>
+                        </label>
+                        <select class="form-select" id="kundentyp" required onchange="toggleFirmaFields()">
+                            <option value="privat">Privatkunde</option>
+                            <option value="firma">Firmenkunde</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group" id="firmaGroup" style="display: none;">
+                        <label class="form-label">
+                            Firmenname <span class="required">*</span>
+                        </label>
+                        <input type="text" class="form-input" id="firma" placeholder="z.B. Mustermann GmbH">
+                    </div>
+                    
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label class="form-label">
+                                Vorname <span class="required">*</span>
+                            </label>
+                            <input type="text" class="form-input" id="vorname" required placeholder="Max">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">
+                                Nachname <span class="required">*</span>
+                            </label>
+                            <input type="text" class="form-input" id="nachname" required placeholder="Mustermann">
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Adresse -->
+                <div class="form-section">
+                    <div class="section-title">
+                        📍 Adresse
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label">
+                            Straße & Hausnummer <span class="required">*</span>
+                        </label>
+                        <input type="text" class="form-input" id="strasse" required placeholder="Musterstraße 123">
+                    </div>
+                    
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label class="form-label">
+                                PLZ <span class="required">*</span>
+                            </label>
+                            <input type="text" class="form-input" id="plz" required placeholder="10115">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">
+                                Ort <span class="required">*</span>
+                            </label>
+                            <input type="text" class="form-input" id="ort" required placeholder="Berlin">
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label">
+                            Land <span class="required">*</span>
+                        </label>
+                        <select class="form-select" id="land" required>
+                            <option value="Deutschland">Deutschland</option>
+                            <option value="Österreich">Österreich</option>
+                            <option value="Schweiz">Schweiz</option>
+                            <option value="Niederlande">Niederlande</option>
+                            <option value="Belgien">Belgien</option>
+                            <option value="Frankreich">Frankreich</option>
+                            <option value="Italien">Italien</option>
+                            <option value="Spanien">Spanien</option>
+                            <option value="Polen">Polen</option>
+                            <option value="Andere">Andere</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <!-- Kontakt -->
+                <div class="form-section">
+                    <div class="section-title">
+                        📞 Kontaktdaten
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label">
+                            E-Mail <span class="required">*</span>
+                        </label>
+                        <input type="email" class="form-input" id="email" required placeholder="kunde@example.com">
+                        <div class="form-hint">Für Rechnungsversand</div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label">
+                            Telefonnummer
+                        </label>
+                        <input type="tel" class="form-input" id="telefon" placeholder="+49 123 456789">
+                    </div>
+                </div>
+                
+                <!-- Steuerinformationen -->
+                <div class="form-section">
+                    <div class="section-title">
+                        🏢 Steuerinformationen
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label">
+                            USt-ID / Steuernummer
+                        </label>
+                        <input type="text" class="form-input" id="ustid" placeholder="DE123456789">
+                        <div class="form-hint">Für Firmenkunden und EU-Rechnungen</div>
+                    </div>
+                    
+                    <div class="checkbox-group">
+                        <input type="checkbox" id="kleinunternehmer">
+                        <label for="kleinunternehmer">Kleinunternehmer (§19 UStG)</label>
+                    </div>
+                </div>
+                
+                <!-- Notizen -->
+                <div class="form-section">
+                    <div class="section-title">
+                        📝 Notizen
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label">
+                            Interne Notizen
+                        </label>
+                        <textarea class="form-textarea" id="notizen" placeholder="z.B. Stammkunde seit 2020, bevorzugt Rechnung per Email..."></textarea>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+    
+    <div class="button-group">
+        <button type="button" class="btn btn-secondary" onclick="cancel()">
+            Abbrechen
+        </button>
+        <button type="button" class="btn btn-primary" onclick="saveCustomer()">
+            💾 Kunde speichern
+        </button>
+    </div>
+    
+    <div class="loading-overlay" id="loadingOverlay">
+        <div class="loading-content">
+            <div class="loading-spinner"></div>
+            <div>Speichere Kundendaten...</div>
+        </div>
+    </div>
+
+    <script>
+        // URL-Parameter
+        const urlParams = new URLSearchParams(window.location.search);
+        const webhookUrl = urlParams.get('webhook') || '';
+        const sessionId = urlParams.get('session') || '';
+        
+        // Firma-Felder ein-/ausblenden
+        function toggleFirmaFields() {
+            const kundentyp = document.getElementById('kundentyp').value;
+            const firmaGroup = document.getElementById('firmaGroup');
+            const firmaInput = document.getElementById('firma');
+            
+            if (kundentyp === 'firma') {
+                firmaGroup.style.display = 'block';
+                firmaInput.required = true;
+            } else {
+                firmaGroup.style.display = 'none';
+                firmaInput.required = false;
+                firmaInput.value = '';
+            }
+        }
+        
+        // Formular validieren
+        function validateForm() {
+            const required = document.querySelectorAll('[required]');
+            let isValid = true;
+            let firstInvalid = null;
+            
+            required.forEach(field => {
+                if (!field.value.trim()) {
+                    field.style.borderColor = '#e74c3c';
+                    isValid = false;
+                    if (!firstInvalid) firstInvalid = field;
+                } else {
+                    field.style.borderColor = '#ddd';
+                }
+            });
+            
+            if (!isValid && firstInvalid) {
+                firstInvalid.focus();
+                showError('Bitte fülle alle Pflichtfelder aus!');
+            }
+            
+            return isValid;
+        }
+        
+        // Fehler anzeigen
+        function showError(message) {
+            const errorDiv = document.getElementById('errorMessage');
+            errorDiv.textContent = message;
+            errorDiv.style.display = 'block';
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+        
+        // Kunde speichern
+        async function saveCustomer() {
+            if (!validateForm()) {
+                return;
+            }
+            
+            // Kundennummer generieren
+            const timestamp = Date.now();
+            const kundennummer = `K-${new Date().getFullYear()}-${String(timestamp).slice(-6)}`;
+            
+            const customerData = {
+                action: 'customer_created',
+                session_id: sessionId,
+                customer: {
+                    id: timestamp.toString(),
+                    kundennummer: kundennummer,
+                    kundentyp: document.getElementById('kundentyp').value,
+                    firma: document.getElementById('firma').value.trim(),
+                    vorname: document.getElementById('vorname').value.trim(),
+                    nachname: document.getElementById('nachname').value.trim(),
+                    strasse: document.getElementById('strasse').value.trim(),
+                    plz: document.getElementById('plz').value.trim(),
+                    ort: document.getElementById('ort').value.trim(),
+                    land: document.getElementById('land').value,
+                    email: document.getElementById('email').value.trim(),
+                    telefon: document.getElementById('telefon').value.trim(),
+                    ustid: document.getElementById('ustid').value.trim(),
+                    kleinunternehmer: document.getElementById('kleinunternehmer').checked,
+                    notizen: document.getElementById('notizen').value.trim(),
+                    erstellt_am: new Date().toISOString()
+                }
+            };
+            
+            if (!webhookUrl) {
+                console.log('Kundendaten:', customerData);
+                alert('Testmodus: Kunde würde gespeichert werden:\n\n' + JSON.stringify(customerData.customer, null, 2));
+                return;
+            }
+            
+            try {
+                // Zeige Loading
+                document.getElementById('loadingOverlay').style.display = 'flex';
+                
+                // Sende an Make.com
+                const response = await fetch(webhookUrl, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(customerData)
+                });
+                
+                if (response.ok) {
+                    // Erfolg!
+                    const displayName = customerData.customer.firma || 
+                                      `${customerData.customer.vorname} ${customerData.customer.nachname}`;
+                    
+                    document.body.innerHTML = `
+                        <div style="display: flex; justify-content: center; align-items: center; height: 100vh; flex-direction: column; padding: 20px; text-align: center;">
+                            <div style="font-size: 80px; margin-bottom: 25px; animation: scaleIn 0.5s ease-out;">✅</div>
+                            <h2 style="font-size: 24px; font-weight: 600; margin-bottom: 10px;">Kunde gespeichert!</h2>
+                            <div style="background: #f8f9fa; padding: 15px 25px; border-radius: 10px; margin: 20px 0;">
+                                <div style="font-weight: 600; font-size: 16px; margin-bottom: 5px;">${displayName}</div>
+                                <div style="font-size: 13px; color: #667781;">${customerData.customer.kundennummer}</div>
+                            </div>
+                            <p style="color: #667781; margin-top: 10px;">Gehe zurück zu WhatsApp</p>
+                        </div>
+                    `;
+                    
+                    setTimeout(() => {
+                        window.close();
+                    }, 2000);
+                } else {
+                    throw new Error('Fehler beim Speichern');
+                }
+            } catch (error) {
+                console.error('Fehler:', error);
+                document.getElementById('loadingOverlay').style.display = 'none';
+                showError('Fehler beim Speichern. Bitte versuche es erneut.');
+            }
+        }
+        
+        // Abbrechen
+        async function cancel() {
+            if (!confirm('Möchtest du wirklich abbrechen? Alle Eingaben gehen verloren.')) {
+                return;
+            }
+            
+            if (webhookUrl) {
+                try {
+                    await fetch(webhookUrl, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({
+                            action: 'cancelled',
+                            session_id: sessionId
+                        })
+                    });
+                } catch (error) {
+                    console.error('Fehler:', error);
+                }
+            }
+            
+            window.close();
+        }
+        
+        // Enter-Taste abfangen (nicht absenden)
+        document.getElementById('customerForm').addEventListener('keypress', (e) => {
+            if (e.key === 'Enter' && e.target.tagName !== 'TEXTAREA') {
+                e.preventDefault();
+            }
+        });
+    </script>
+</body>
+</html>

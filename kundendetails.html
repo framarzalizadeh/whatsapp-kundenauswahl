@@ -1,0 +1,461 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kundendetails</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Arial, sans-serif;
+            background: #f0f2f5;
+            padding: 20px;
+            padding-bottom: 80px;
+        }
+        
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+        
+        .header {
+            background: linear-gradient(135deg, #25D366 0%, #128C7E 100%);
+            color: white;
+            padding: 25px 20px;
+        }
+        
+        .customer-name {
+            font-size: 26px;
+            font-weight: 600;
+            margin-bottom: 5px;
+        }
+        
+        .customer-number {
+            font-size: 14px;
+            opacity: 0.95;
+            display: inline-block;
+            background: rgba(255,255,255,0.2);
+            padding: 4px 12px;
+            border-radius: 12px;
+        }
+        
+        .content {
+            padding: 0;
+        }
+        
+        .info-section {
+            padding: 20px;
+            border-bottom: 8px solid #f0f2f5;
+        }
+        
+        .info-section:last-child {
+            border-bottom: none;
+        }
+        
+        .section-title {
+            font-size: 13px;
+            font-weight: 600;
+            color: #8696a0;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 15px;
+        }
+        
+        .info-row {
+            display: flex;
+            padding: 12px 0;
+            border-bottom: 1px solid #f0f0f0;
+        }
+        
+        .info-row:last-child {
+            border-bottom: none;
+        }
+        
+        .info-label {
+            flex: 0 0 120px;
+            font-size: 14px;
+            color: #8696a0;
+            font-weight: 500;
+        }
+        
+        .info-value {
+            flex: 1;
+            font-size: 15px;
+            color: #1f1f1f;
+            word-break: break-word;
+        }
+        
+        .info-value.empty {
+            color: #ccc;
+            font-style: italic;
+        }
+        
+        .address-box {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 8px;
+            border-left: 3px solid #25D366;
+            line-height: 1.6;
+            color: #3b4a54;
+        }
+        
+        .badge {
+            display: inline-block;
+            padding: 4px 10px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+        
+        .badge-private {
+            background: #e3f2fd;
+            color: #1976d2;
+        }
+        
+        .badge-company {
+            background: #fff3e0;
+            color: #f57c00;
+        }
+        
+        .badge-yes {
+            background: #e8f5e9;
+            color: #388e3c;
+        }
+        
+        .action-buttons {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: white;
+            padding: 15px 20px;
+            box-shadow: 0 -2px 10px rgba(0,0,0,0.1);
+            display: flex;
+            gap: 10px;
+        }
+        
+        .btn {
+            flex: 1;
+            padding: 14px 20px;
+            border: none;
+            border-radius: 10px;
+            font-size: 15px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+        
+        .btn-primary {
+            background: #25D366;
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            background: #20bd5a;
+            transform: translateY(-1px);
+        }
+        
+        .btn-secondary {
+            background: #f0f2f5;
+            color: #3b4a54;
+        }
+        
+        .btn-secondary:hover {
+            background: #e4e6e9;
+        }
+        
+        .btn-danger {
+            background: #fee;
+            color: #e74c3c;
+        }
+        
+        .btn-danger:hover {
+            background: #fdd;
+        }
+        
+        .loading {
+            padding: 80px 20px;
+            text-align: center;
+            color: #667781;
+        }
+        
+        .loading-spinner {
+            width: 50px;
+            height: 50px;
+            border: 5px solid #f3f3f3;
+            border-top: 5px solid #25D366;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 20px;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        .back-button {
+            background: rgba(255,255,255,0.2);
+            border: none;
+            color: white;
+            padding: 8px 16px;
+            border-radius: 8px;
+            font-size: 14px;
+            cursor: pointer;
+            margin-bottom: 15px;
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+        }
+        
+        .back-button:hover {
+            background: rgba(255,255,255,0.3);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div id="content">
+            <div class="loading">
+                <div class="loading-spinner"></div>
+                <div>Lade Kundendaten...</div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // URL-Parameter
+        const urlParams = new URLSearchParams(window.location.search);
+        const customerId = urlParams.get('id') || '';
+        const webhookUrl = urlParams.get('webhook') || '';
+        const sessionId = urlParams.get('session') || '';
+        const apiUrl = urlParams.get('api') || '';
+        
+        // Kundendaten laden
+        async function loadCustomer() {
+            try {
+                let customer;
+                
+                if (apiUrl) {
+                    // Echte Daten von API laden
+                    const response = await fetch(`${apiUrl}?id=${customerId}`);
+                    customer = await response.json();
+                } else {
+                    // Beispieldaten für Test
+                    customer = {
+                        id: "1",
+                        kundennummer: "K-2024-001",
+                        kundentyp: "privat",
+                        vorname: "Max",
+                        nachname: "Mustermann",
+                        firma: "",
+                        strasse: "Musterstraße 123",
+                        plz: "10115",
+                        ort: "Berlin",
+                        land: "Deutschland",
+                        email: "max.mustermann@example.com",
+                        telefon: "+49 30 123456",
+                        ustid: "",
+                        kleinunternehmer: false,
+                        notizen: "Stammkunde seit 2020. Bevorzugt Rechnungen per E-Mail.",
+                        erstellt_am: "2024-01-15T10:30:00Z"
+                    };
+                }
+                
+                displayCustomer(customer);
+            } catch (error) {
+                console.error('Fehler:', error);
+                document.getElementById('content').innerHTML = `
+                    <div class="loading">
+                        <div style="font-size: 48px; margin-bottom: 20px;">⚠️</div>
+                        <div>Fehler beim Laden der Kundendaten</div>
+                    </div>
+                `;
+            }
+        }
+        
+        // Kundendaten anzeigen
+        function displayCustomer(customer) {
+            const displayName = customer.firma || `${customer.vorname} ${customer.nachname}`;
+            const subtitle = customer.firma ? `${customer.vorname} ${customer.nachname}` : '';
+            const kundentyp = customer.kundentyp === 'firma' ? 'Firmenkunde' : 'Privatkunde';
+            const kundentypClass = customer.kundentyp === 'firma' ? 'badge-company' : 'badge-private';
+            
+            const html = `
+                <div class="header">
+                    <button class="back-button" onclick="goBack()">← Zurück</button>
+                    <div class="customer-name">${displayName}</div>
+                    ${subtitle ? `<div style="font-size: 15px; opacity: 0.9; margin-bottom: 8px;">${subtitle}</div>` : ''}
+                    <div class="customer-number">${customer.kundennummer}</div>
+                </div>
+                
+                <div class="content">
+                    <!-- Kundentyp -->
+                    <div class="info-section">
+                        <div class="section-title">📋 Kundentyp</div>
+                        <span class="badge ${kundentypClass}">${kundentyp}</span>
+                    </div>
+                    
+                    <!-- Adresse -->
+                    <div class="info-section">
+                        <div class="section-title">📍 Adresse</div>
+                        <div class="address-box">
+                            ${customer.firma ? `<strong>${customer.firma}</strong><br>` : ''}
+                            ${customer.vorname} ${customer.nachname}<br>
+                            ${customer.strasse}<br>
+                            ${customer.plz} ${customer.ort}<br>
+                            ${customer.land}
+                        </div>
+                    </div>
+                    
+                    <!-- Kontakt -->
+                    <div class="info-section">
+                        <div class="section-title">📞 Kontakt</div>
+                        <div class="info-row">
+                            <div class="info-label">E-Mail</div>
+                            <div class="info-value">
+                                <a href="mailto:${customer.email}" style="color: #25D366; text-decoration: none;">${customer.email}</a>
+                            </div>
+                        </div>
+                        <div class="info-row">
+                            <div class="info-label">Telefon</div>
+                            <div class="info-value ${customer.telefon ? '' : 'empty'}">
+                                ${customer.telefon ? `<a href="tel:${customer.telefon}" style="color: #25D366; text-decoration: none;">${customer.telefon}</a>` : 'Nicht angegeben'}
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Steuer -->
+                    <div class="info-section">
+                        <div class="section-title">🏢 Steuerinformationen</div>
+                        <div class="info-row">
+                            <div class="info-label">USt-ID</div>
+                            <div class="info-value ${customer.ustid ? '' : 'empty'}">
+                                ${customer.ustid || 'Nicht angegeben'}
+                            </div>
+                        </div>
+                        <div class="info-row">
+                            <div class="info-label">Kleinuntern.</div>
+                            <div class="info-value">
+                                ${customer.kleinunternehmer ? '<span class="badge badge-yes">Ja</span>' : 'Nein'}
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Notizen -->
+                    ${customer.notizen ? `
+                        <div class="info-section">
+                            <div class="section-title">📝 Notizen</div>
+                            <div class="info-value" style="line-height: 1.6;">${customer.notizen}</div>
+                        </div>
+                    ` : ''}
+                    
+                    <!-- Metadaten -->
+                    <div class="info-section">
+                        <div class="section-title">ℹ️ Weitere Informationen</div>
+                        <div class="info-row">
+                            <div class="info-label">Erstellt am</div>
+                            <div class="info-value">
+                                ${customer.erstellt_am ? formatDate(customer.erstellt_am) : 'Unbekannt'}
+                            </div>
+                        </div>
+                        <div class="info-row">
+                            <div class="info-label">Kunden-ID</div>
+                            <div class="info-value" style="font-family: monospace; font-size: 13px;">
+                                ${customer.id}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+            
+            document.querySelector('.container').innerHTML = html;
+            
+            // Action Buttons hinzufügen
+            const actionButtons = document.createElement('div');
+            actionButtons.className = 'action-buttons';
+            actionButtons.innerHTML = `
+                <button class="btn btn-secondary" onclick="goBack()">
+                    ← Zurück
+                </button>
+                <button class="btn btn-primary" onclick="useCustomer('${customer.id}', '${displayName}', '${customer.kundennummer}')">
+                    ✓ Auswählen
+                </button>
+            `;
+            document.body.appendChild(actionButtons);
+        }
+        
+        // Datum formatieren
+        function formatDate(isoString) {
+            const date = new Date(isoString);
+            return date.toLocaleDateString('de-DE', {
+                day: '2-digit',
+                month: '2-digit',
+                year: 'numeric',
+                hour: '2-digit',
+                minute: '2-digit'
+            });
+        }
+        
+        // Kunde verwenden
+        async function useCustomer(id, name, nummer) {
+            if (!webhookUrl) {
+                alert(`Kunde ausgewählt: ${name}`);
+                return;
+            }
+            
+            try {
+                await fetch(webhookUrl, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        action: 'customer_selected',
+                        customer_id: id,
+                        customer_name: name,
+                        customer_number: nummer,
+                        session_id: sessionId
+                    })
+                });
+                
+                document.querySelector('.container').innerHTML = `
+                    <div class="loading">
+                        <div style="font-size: 80px; margin-bottom: 25px;">✅</div>
+                        <h2 style="font-size: 24px; font-weight: 600; margin-bottom: 10px;">Kunde ausgewählt!</h2>
+                        <p style="color: #667781; margin-top: 10px;">Gehe zurück zu WhatsApp</p>
+                    </div>
+                `;
+                
+                setTimeout(() => {
+                    window.close();
+                }, 2000);
+            } catch (error) {
+                console.error('Fehler:', error);
+                alert('Fehler beim Senden der Auswahl');
+            }
+        }
+        
+        // Zurück zur Liste
+        function goBack() {
+            window.history.back();
+        }
+        
+        // Beim Laden
+        loadCustomer();
+    </script>
+</body>
+</html>
