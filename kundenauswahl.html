@@ -1,0 +1,315 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kunde auswählen</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Arial, sans-serif;
+            background: #f0f2f5;
+            padding: 20px;
+            padding-bottom: 80px;
+        }
+        
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+        
+        .header {
+            background: #25D366;
+            color: white;
+            padding: 20px;
+            text-align: center;
+        }
+        
+        .header h1 {
+            font-size: 24px;
+            margin-bottom: 5px;
+        }
+        
+        .search-box {
+            padding: 15px;
+            background: #f8f9fa;
+            border-bottom: 1px solid #e9ecef;
+        }
+        
+        .search-box input {
+            width: 100%;
+            padding: 12px 15px;
+            border: 1px solid #ddd;
+            border-radius: 25px;
+            font-size: 16px;
+            outline: none;
+            transition: border-color 0.3s;
+        }
+        
+        .search-box input:focus {
+            border-color: #25D366;
+        }
+        
+        .customer-list {
+            max-height: 60vh;
+            overflow-y: auto;
+        }
+        
+        .customer-item {
+            padding: 15px 20px;
+            border-bottom: 1px solid #f0f0f0;
+            cursor: pointer;
+            transition: background 0.2s;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .customer-item:hover {
+            background: #f8f9fa;
+        }
+        
+        .customer-item:active {
+            background: #e9ecef;
+        }
+        
+        .customer-info {
+            flex: 1;
+        }
+        
+        .customer-name {
+            font-size: 16px;
+            font-weight: 600;
+            color: #1f1f1f;
+            margin-bottom: 4px;
+        }
+        
+        .customer-details {
+            font-size: 13px;
+            color: #667781;
+        }
+        
+        .customer-arrow {
+            color: #8696a0;
+            font-size: 18px;
+        }
+        
+        .no-results {
+            padding: 40px 20px;
+            text-align: center;
+            color: #667781;
+        }
+        
+        .loading {
+            padding: 40px 20px;
+            text-align: center;
+            color: #667781;
+        }
+        
+        .new-customer-btn {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: #25D366;
+            color: white;
+            border: none;
+            padding: 15px 25px;
+            border-radius: 30px;
+            font-size: 16px;
+            font-weight: 600;
+            box-shadow: 0 4px 12px rgba(37, 211, 102, 0.4);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: transform 0.2s;
+        }
+        
+        .new-customer-btn:hover {
+            transform: scale(1.05);
+        }
+        
+        .new-customer-btn:active {
+            transform: scale(0.95);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>👥 Kunde auswählen</h1>
+            <p>Wähle einen Kunden für die Rechnung</p>
+        </div>
+        
+        <div class="search-box">
+            <input type="text" id="searchInput" placeholder="🔍 Kunde suchen...">
+        </div>
+        
+        <div class="customer-list" id="customerList">
+            <div class="loading">Lade Kunden...</div>
+        </div>
+    </div>
+    
+    <button class="new-customer-btn" onclick="createNewCustomer()">
+        ➕ Neuer Kunde
+    </button>
+
+    <script>
+        // URL-Parameter auslesen
+        const urlParams = new URLSearchParams(window.location.search);
+        const webhookUrl = urlParams.get('webhook') || '';
+        const sessionId = urlParams.get('session') || '';
+        const apiUrl = urlParams.get('api') || '';
+        
+        // Beispiel-Kunden (später durch echte API-Daten ersetzen)
+        let customers = [];
+        
+        // Kunden von API laden
+        async function loadCustomers() {
+            try {
+                if (apiUrl) {
+                    const response = await fetch(apiUrl);
+                    customers = await response.json();
+                } else {
+                    // Beispieldaten für Test
+                    customers = [
+                        { id: "1", name: "Max Mustermann", kundennummer: "K001", email: "max@example.com", telefon: "+49 123 456789" },
+                        { id: "2", name: "Maria Müller", kundennummer: "K002", email: "maria@example.com", telefon: "+49 123 456790" },
+                        { id: "3", name: "Peter Schmidt", kundennummer: "K003", email: "peter@example.com", telefon: "+49 123 456791" },
+                        { id: "4", name: "Anna Weber", kundennummer: "K004", email: "anna@example.com", telefon: "+49 123 456792" },
+                        { id: "5", name: "Thomas Becker", kundennummer: "K005", email: "thomas@example.com", telefon: "+49 123 456793" },
+                        { id: "6", name: "Laura Fischer", kundennummer: "K006", email: "laura@example.com", telefon: "+49 123 456794" },
+                        { id: "7", name: "Michael Wagner", kundennummer: "K007", email: "michael@example.com", telefon: "+49 123 456795" },
+                        { id: "8", name: "Sandra Hoffmann", kundennummer: "K008", email: "sandra@example.com", telefon: "+49 123 456796" }
+                    ];
+                }
+                displayCustomers(customers);
+            } catch (error) {
+                console.error('Fehler beim Laden der Kunden:', error);
+                document.getElementById('customerList').innerHTML = '<div class="no-results">Fehler beim Laden der Kunden</div>';
+            }
+        }
+        
+        // Kunden anzeigen
+        function displayCustomers(customersToShow) {
+            const listElement = document.getElementById('customerList');
+            
+            if (customersToShow.length === 0) {
+                listElement.innerHTML = '<div class="no-results">Keine Kunden gefunden</div>';
+                return;
+            }
+            
+            listElement.innerHTML = customersToShow.map(customer => `
+                <div class="customer-item" onclick="selectCustomer('${customer.id}', '${customer.name}', '${customer.kundennummer}')">
+                    <div class="customer-info">
+                        <div class="customer-name">${customer.name}</div>
+                        <div class="customer-details">Kunde-Nr: ${customer.kundennummer} ${customer.email ? '• ' + customer.email : ''}</div>
+                    </div>
+                    <div class="customer-arrow">›</div>
+                </div>
+            `).join('');
+        }
+        
+        // Suchfunktion
+        document.getElementById('searchInput').addEventListener('input', (e) => {
+            const searchTerm = e.target.value.toLowerCase();
+            const filtered = customers.filter(customer => 
+                customer.name.toLowerCase().includes(searchTerm) ||
+                customer.kundennummer.toLowerCase().includes(searchTerm) ||
+                (customer.email && customer.email.toLowerCase().includes(searchTerm))
+            );
+            displayCustomers(filtered);
+        });
+        
+        // Kunde auswählen
+        async function selectCustomer(id, name, kundennummer) {
+            if (!webhookUrl) {
+                alert(`Kunde ausgewählt: ${name} (${kundennummer})`);
+                return;
+            }
+            
+            try {
+                // Daten an Make.com Webhook senden
+                const response = await fetch(webhookUrl, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        action: 'customer_selected',
+                        customer_id: id,
+                        customer_name: name,
+                        customer_number: kundennummer,
+                        session_id: sessionId
+                    })
+                });
+                
+                if (response.ok) {
+                    // Erfolgsbestätigung
+                    document.body.innerHTML = `
+                        <div style="display: flex; justify-content: center; align-items: center; height: 100vh; flex-direction: column;">
+                            <div style="font-size: 60px; margin-bottom: 20px;">✅</div>
+                            <h2>Kunde ausgewählt!</h2>
+                            <p style="color: #667781; margin-top: 10px;">${name}</p>
+                            <p style="color: #667781; margin-top: 20px;">Du kannst jetzt zurück zu WhatsApp gehen</p>
+                        </div>
+                    `;
+                    
+                    // Nach 2 Sekunden Seite schließen (falls möglich)
+                    setTimeout(() => {
+                        window.close();
+                    }, 2000);
+                } else {
+                    alert('Fehler beim Senden der Auswahl');
+                }
+            } catch (error) {
+                console.error('Fehler:', error);
+                alert('Fehler beim Senden der Auswahl');
+            }
+        }
+        
+        // Neuen Kunden erstellen
+        async function createNewCustomer() {
+            if (!webhookUrl) {
+                alert('Neuer Kunde erstellen');
+                return;
+            }
+            
+            try {
+                await fetch(webhookUrl, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        action: 'create_new_customer',
+                        session_id: sessionId
+                    })
+                });
+                
+                document.body.innerHTML = `
+                    <div style="display: flex; justify-content: center; align-items: center; height: 100vh; flex-direction: column;">
+                        <div style="font-size: 60px; margin-bottom: 20px;">➕</div>
+                        <h2>Neuen Kunden erstellen</h2>
+                        <p style="color: #667781; margin-top: 10px;">Gehe zurück zu WhatsApp um fortzufahren</p>
+                    </div>
+                `;
+            } catch (error) {
+                console.error('Fehler:', error);
+            }
+        }
+        
+        // Beim Laden der Seite Kunden laden
+        loadCustomers();
+    </script>
+</body>
+</html>
